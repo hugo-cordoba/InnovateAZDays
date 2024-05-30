@@ -33,5 +33,6 @@ jobs:
         python3 --version
         cat requirements.txt
         pip3 install -r requirements.txt
+        set
         python3 generator.py
 

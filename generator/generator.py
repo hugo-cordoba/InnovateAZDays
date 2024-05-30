@@ -7,11 +7,16 @@ client = AzureOpenAI(
     azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     )
 
-deployment = os.getenv["CHAT_COMPLETIONS_DEPLOYMENT_NAME"]
+deployment = os.getenv("CHAT_COMPLETIONS_DEPLOYMENT_NAME")
+
+messages = [{"role": "system", "content": "You are a HELPFUL assistant answering users questions. Answer in a clear and concise manner."},
+            {"role": "user", "content": "Write a tagline for an ice cream shop"}]
 
 response = client.chat.completions.create(
         model=deployment,
-        messages = 'Write a tagline for an ice cream shop',
-        temperature=0.7,
+        messages = messages,
+        temperature=0.99,
         max_tokens=800
     )
+
+print(response.choices[0].message.content)
