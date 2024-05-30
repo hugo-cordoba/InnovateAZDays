@@ -4,16 +4,34 @@ on:
   issues:
     types: [opened]
 
+env:
+  azure_openai_api_key: ${{ secrets.AZURE_OPENAI_API_KEY }}
+  azure_openai_endpoint: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+  chat_completions_deployment_name: ${{ secrets.CHAT_COMPLETIONS_DEPLOYMENT_NAME }}
+
 jobs:
-  dump:
+  generate:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: print all
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run:   echo "$GITHUB_CONTEXT"
     - name: print body
       env:
-        BODY: ${{ github.event.comment.body }}
+        BODY: ${{ github.event.issue.body }}
       run: echo "$BODY"
+    - name: generate
+      run: |
+        cd generator
+        mkdir -p temp
+        echo "${{ github.event.issue.body }}" > temp/body.txt
+        python3 --version
+        cat requirements.txt
+        pip3 install -r requirements.txt
+        python3 generate.py
 
