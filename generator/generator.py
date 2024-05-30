@@ -1,4 +1,5 @@
 import os
+import re
 from openai import AzureOpenAI
 
 client = AzureOpenAI(
@@ -9,8 +10,30 @@ client = AzureOpenAI(
 
 deployment = os.getenv("CHAT_COMPLETIONS_DEPLOYMENT_NAME")
 
-messages = [{"role": "system", "content": "You are a HELPFUL assistant answering users questions. Answer in a clear and concise manner."},
-            {"role": "user", "content": "Write a tagline for an ice cream shop"}]
+with open('temp/body.txt') as f:
+    issue_body = f.read()
+    if "](https://" in issue_body:
+        url = issue_body.split("](")[1].split(")")[0]
+        print(url)
+    else:
+        print("No image found")
+        quit()
+
+messages=[
+        { "role": "system", "content": "You are a helpful assistant." },
+        { "role": "user", "content": [  
+            { 
+                "type": "text", 
+                "text": "Describe this picture:" 
+            },
+            { 
+                "type": "image_url",
+                "image_url": {
+                    "url": url
+                }
+            }
+        ] } 
+    ]
 
 response = client.chat.completions.create(
         model=deployment,
