@@ -1,0 +1,19 @@
+name: Issue Workflow
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print all
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run:   echo "$GITHUB_CONTEXT"
+    - name: print body
+      env:
+        BODY: ${{ github.event.comment.body }}
+      run: echo "$BODY"
+
