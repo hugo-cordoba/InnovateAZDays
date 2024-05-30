@@ -5,9 +5,9 @@ on:
     types: [opened]
 
 env:
-  azure_openai_api_key: ${{ secrets.AZURE_OPENAI_API_KEY }}
-  azure_openai_endpoint: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-  chat_completions_deployment_name: ${{ secrets.CHAT_COMPLETIONS_DEPLOYMENT_NAME }}
+  AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+  AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+  CHAT_COMPLETIONS_DEPLOYMENT_NAME: ${{ secrets.CHAT_COMPLETIONS_DEPLOYMENT_NAME }}
 
 jobs:
   generate:
