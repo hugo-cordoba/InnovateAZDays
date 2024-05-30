@@ -20,11 +20,11 @@ with open('temp/body.txt') as f:
         quit()
 
 messages=[
-        { "role": "system", "content": "You are a helpful assistant." },
+        { "role": "system", "content": "You are an assistant for web developers. You provide working source code based in the requirements of the developers. When they ask you to generate source files your answer must be only the file content, don't add any explanation, instructions or whatever and don't wrap it in markdown, just output the file content." },
         { "role": "user", "content": [  
             { 
                 "type": "text", 
-                "text": "Describe this picture:" 
+                "text": "I need the HTML and CSS files to create a web page based in this image. Please, first generate only the HTML file." 
             },
             { 
                 "type": "image_url",
@@ -34,6 +34,20 @@ messages=[
             }
         ] } 
     ]
+
+css_message = { "role": "user", "content": "Now please generate only the CSS file." }
+
+response = client.chat.completions.create(
+        model=deployment,
+        messages = messages,
+        temperature=0.99,
+        max_tokens=800
+    )
+
+print(response.choices[0].message.content)
+
+messages.append(response.choices[0].message)
+messages.append(css_message)
 
 response = client.chat.completions.create(
         model=deployment,
