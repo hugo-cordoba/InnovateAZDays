@@ -17,7 +17,7 @@ def call_openai_and_write_file(messages, file_name=""):
     )
 
     file_json = json.loads(response.choices[0].message.content)
-    print(file_json['filecontent'])
+    print(response.choices[0].message.content)
 
     if not file_name:
         file_name = "temp/" + file_json['filename']
@@ -47,7 +47,7 @@ messages=[
     { "role": "user", "content": [  
         { 
             "type": "text", 
-            "text": f"Based on this image, generate a markdown with the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary of the component and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this component. Reply with the markdown file contents formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." 
+            "text": f"Based on this image, generate a markdown file describing the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary of the component and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this component. Reply with the markdown file contents formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." 
         },
         { 
             "type": "image_url",
