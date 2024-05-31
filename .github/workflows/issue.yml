@@ -29,7 +29,7 @@ jobs:
       run: echo "$BODY"
     - name: Generate scaffold
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
       run: |
         cd generator
