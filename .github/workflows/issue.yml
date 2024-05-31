@@ -32,6 +32,7 @@ jobs:
         cd generator
         mkdir -p temp
         echo "${{ github.event.issue.body }}" > temp/body.txt
+        echo "${{ github.event.issue.title }}" > temp/title.txt
         pip3 install -r requirements.txt
         python3 generator.py
 

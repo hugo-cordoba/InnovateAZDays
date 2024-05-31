@@ -32,6 +32,18 @@ def get_url(file):
         else:
             return None
 
+def get_appname(file):
+    with open(file) as f:
+        issue_title = f.read()
+        if "App:" in issue_title:
+            appname = issue_title.split("App:")[1].strip().replace(" ", "").lower()
+            return appname
+        else:
+            return None
+
+appname = get_appname('temp/title.txt')
+print(appname)
+
 url = get_url('temp/body.txt')
 print(url)
 
@@ -40,7 +52,7 @@ messages=[
         { "role": "user", "content": [  
             { 
                 "type": "text", 
-                "text": "Based in this image, generate a markdown with the files that would be generated for a new standalone angular component for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this app." 
+                "text": f"Based in this image, generate a markdown with the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary of the application and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this app. Reply with the markdown source code only. Don't wrap the answer in markdown." 
             },
             { 
                 "type": "image_url",
@@ -64,28 +76,28 @@ messages.append(response)
 messages.append(model_message)
 
 response = call_openai(messages)
-write_file('temp/model.ts', response.content)
+write_file(f'temp/{appname}.model.ts', response.content)
 
 messages.append(response)
 messages.append(service_message)
 
 response = call_openai(messages)
-write_file('temp/service.ts', response.content)
+write_file(f'temp/{appname}.service.ts', response.content)
 
 messages.append(response)
 messages.append(logic_message)
 
 response = call_openai(messages)
-write_file('temp/logic.ts', response.content)
+write_file(f'temp/{appname}.component.ts', response.content)
 
 messages.append(response)
 messages.append(html_message)
 
 response = call_openai(messages)
-write_file('temp/html.html', response.content)
+write_file(f'temp/{appname}.component.html', response.content)
 
 messages.append(response)
 messages.append(css_message)
 
 response = call_openai(messages)
-write_file('temp/css.css', response.content)
+write_file(f'temp/{appname}.component.css', response.content)
