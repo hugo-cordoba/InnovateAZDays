@@ -14,7 +14,7 @@ def call_openai(messages):
         model=deployment,
         messages = messages,
         temperature=0.1,
-        max_tokens=5000
+        max_tokens=4000
     )
     print(response.choices[0].message.content)
     return response.choices[0].message
