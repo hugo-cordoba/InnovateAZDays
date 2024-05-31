@@ -42,7 +42,12 @@ jobs:
       run: gh issue comment "${{ github.event.issue.number }}" --body-file generator/temp/summary.md
 
     - name: Install Latest Angular
-      uses: actions/angular-github-actions
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: 'npm'
 
     - name: DEBUG angular
-      run: ng version
+      run: |
+        npm install @angular/cli@18
+
