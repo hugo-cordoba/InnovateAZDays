@@ -21,12 +21,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: DEBUG print all
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
-
-    - name: Generate scaffold
+    - name: Generate Angular Component using GPT-4o
       env:
         PYTHONUNBUFFERED: "1"
       run: |
@@ -47,7 +42,7 @@ jobs:
         npm install -g @angular/cli
         ng version
 
-    - name: Generate Angular Component
+    - name: Generate Angular component
       run: |
         APP_NAME=$(cat generator/temp/appname.txt)
         ng generate component $APP_NAME
@@ -55,7 +50,7 @@ jobs:
         cp generator/temp/*.html src/app/$APP_NAME
         cp generator/temp/*.css src/app/$APP_NAME
 
-    - name: Commit and Push
+    - name: Commit and push generated component
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
@@ -63,7 +58,7 @@ jobs:
         git commit -m "generated component"
         git push
 
-    - name: Publish Summary to Issue
+    - name: Publish summary to issue
       env:
         GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
