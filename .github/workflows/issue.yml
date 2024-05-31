@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      contents: write
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -47,8 +48,24 @@ jobs:
       with:
         node-version: 22
 
-    - name: DEBUG angular
+    - name: Install Angular CLI
       run: |
         npm install -g @angular/cli
         ng version
+
+    - name: Generate Angular Component
+      run: |
+        APP_NAME=$(cat temp/appname.txt)
+        ng generate component $APP_NAME
+        cp generator/*.ts src/app/$APP_NAME
+        cp generator/*.html src/app/$APP_NAME
+        cp generator/*.css src/app/$APP_NAME
+
+    - name: Commit and Push
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "generated component"
+        git push
 

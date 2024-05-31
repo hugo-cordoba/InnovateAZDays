@@ -32,9 +32,12 @@ def get_url(file):
         return issue_body.split("](")[1].split(")")[0]
 
 def get_appname(file):
+    appname = ""
     with open(file) as f:
-        issue_title = f.read()
-        return issue_title.split("App:")[1].strip().replace(" ", "").lower()
+        appname = f.read().split("App:")[1].strip().replace(" ", "").lower()
+    with open("temp/appname.txt", 'w') as f:
+        f.write(appname)
+    return appname
 
 appname = get_appname('temp/title.txt')
 url = get_url('temp/body.txt')
