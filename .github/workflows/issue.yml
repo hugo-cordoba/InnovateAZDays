@@ -49,6 +49,6 @@ jobs:
 
     - name: DEBUG angular
       run: |
-        npm install @angular/cli@18
+        npm install -g @angular/cli
         ng version
 

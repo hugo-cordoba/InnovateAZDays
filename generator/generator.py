@@ -1,103 +1,86 @@
 import os
+import json
 from openai import AzureOpenAI
 
 client = AzureOpenAI(
-    api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
-    api_version="2024-02-01",
+    api_key = os.getenv("AZURE_OPENAI_API_KEY"),  
+    api_version = "2024-02-01",
     azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     )
 
-deployment = os.getenv("CHAT_COMPLETIONS_DEPLOYMENT_NAME")
-
-def call_openai(messages):
+def call_openai_and_write_file(messages, file_name=""):
     response = client.chat.completions.create(
-        model=deployment,
+        model = os.getenv("CHAT_COMPLETIONS_DEPLOYMENT_NAME"),
         messages = messages,
-        temperature=0.1,
-        max_tokens=4000
+        temperature = 0.1,
+        max_tokens = 4000
     )
-    print(response.choices[0].message.content)
-    return response.choices[0].message
 
-def write_file(file_name, content):
+    file_json = json.loads(response.choices[0].message.content)
+    print(file_json['filecontent'])
+
+    if not file_name:
+        file_name = "temp/" + file_json['filename']
     with open(file_name, 'w') as f:
-        f.write(content)
+        f.write(file_json['filecontent'])
+
+    return response.choices[0].message
 
 def get_url(file):
     with open(file) as f:
         issue_body = f.read()
-        if "](https://" in issue_body:
-            url = issue_body.split("](")[1].split(")")[0]
-            return url
-        else:
-            return None
+        return issue_body.split("](")[1].split(")")[0]
 
 def get_appname(file):
     with open(file) as f:
         issue_title = f.read()
-        if "App:" in issue_title:
-            appname = issue_title.split("App:")[1].strip().replace(" ", "").lower()
-            return appname
-        else:
-            return None
+        return issue_title.split("App:")[1].strip().replace(" ", "").lower()
 
 appname = get_appname('temp/title.txt')
-print(appname)
-
 url = get_url('temp/body.txt')
-print(url)
 
 messages=[
-        { "role": "system", "content": "You are an assistant for web developers. You provide working source code based in image sketches." },
-        { "role": "user", "content": [  
-            { 
-                "type": "text", 
-                "text": f"Based in this image, generate a markdown with the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary of the application and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this app. Reply with the markdown source code only. Don't wrap the answer in markdown." 
-            },
-            { 
-                "type": "image_url",
-                "image_url": {
-                    "url": url
-                }
-            }
-        ] } 
-    ]
-
-model_message = { "role": "user", "content": "Generate the component model implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
-service_message = { "role": "user", "content": "Generate the component service implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
-logic_message = { "role": "user", "content": "Generate the component logic implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
-html_message = { "role": "user", "content": "Generate the component html implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
-css_message = { "role": "user", "content": "Generate the component css implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
-
-response = call_openai(messages)
-write_file('temp/summary.md', response.content)
+    { "role": "system", "content": "You are an assistant for web developers. You provide working source code based on image sketches." },
+    { "role": "user", "content": [  
+        { 
+            "type": "text", 
+            "text": f"Based on this image, generate a markdown with the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary of the component and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this component. Reply with the markdown file contents formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." 
+        },
+        { 
+            "type": "image_url",
+            "image_url": { "url": url }
+        }
+    ] }
+]
+print("🚀🚀🚀 GENERATING SUMMARY 🚀🚀🚀")
+response = call_openai_and_write_file(messages, 'temp/summary.md')
 
 messages.append(response)
-messages.append(model_message)
+messages.append({ "role": "user", "content": "Generate the component model implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 
-response = call_openai(messages)
-write_file(f'temp/{appname}.model.ts', response.content)
-
-messages.append(response)
-messages.append(service_message)
-
-response = call_openai(messages)
-write_file(f'temp/{appname}.service.ts', response.content)
+print("🚀🚀🚀 GENERATING MODEL 🚀🚀🚀")
+response = call_openai_and_write_file(messages)
 
 messages.append(response)
-messages.append(logic_message)
+messages.append({ "role": "user", "content": "Generate the component service implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 
-response = call_openai(messages)
-write_file(f'temp/{appname}.component.ts', response.content)
-
-messages.append(response)
-messages.append(html_message)
-
-response = call_openai(messages)
-write_file(f'temp/{appname}.component.html', response.content)
+print("🚀🚀🚀 GENERATING SERVICE 🚀🚀🚀")
+response = call_openai_and_write_file(messages)
 
 messages.append(response)
-messages.append(css_message)
+messages.append({ "role": "user", "content": "Generate the component logic implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 
-response = call_openai(messages)
-write_file(f'temp/{appname}.component.css', response.content)
+print("🚀🚀🚀 GENERATING LOGIC 🚀🚀🚀")
+response = call_openai_and_write_file(messages)
+
+messages.append(response)
+messages.append({ "role": "user", "content": "Generate the component html implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
+
+print("🚀🚀🚀 GENERATING HTML 🚀🚀🚀")
+response = call_openai_and_write_file(messages)
+
+messages.append(response)
+messages.append({ "role": "user", "content": "Generate the component css implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
+
+print("🚀🚀🚀 GENERATING CSS 🚀🚀🚀")
+response = call_openai_and_write_file(messages)
