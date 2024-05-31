@@ -28,9 +28,6 @@ jobs:
         BODY: ${{ github.event.issue.body }}
       run: echo "$BODY"
     - name: Generate scaffold
-      env:
-        GH_TOKEN: ${{ github.token }}
-        GH_REPO: ${{ github.repository }}
       run: |
         cd generator
         mkdir -p temp
@@ -38,4 +35,7 @@ jobs:
         pip3 install -r requirements.txt
         python3 generator.py
     - name: Publish Results
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
       run: gh issue comment "${{ github.event.issue.number }}" --body-file generator/temp/summary.md
