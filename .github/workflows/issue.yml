@@ -37,13 +37,7 @@ jobs:
         pip3 install -r requirements.txt
         python3 generator.py
 
-    - name: Publish Results
-      env:
-        GH_TOKEN: ${{ github.token }}
-        GH_REPO: ${{ github.repository }}
-      run: gh issue comment "${{ github.event.issue.number }}" --body-file generator/temp/summary.md
-
-    - name: Install Latest Angular
+    - name: Install Node
       uses: actions/setup-node@v4
       with:
         node-version: 22
@@ -55,11 +49,11 @@ jobs:
 
     - name: Generate Angular Component
       run: |
-        APP_NAME=$(cat temp/appname.txt)
+        APP_NAME=$(cat generator/temp/appname.txt)
         ng generate component $APP_NAME
-        cp generator/*.ts src/app/$APP_NAME
-        cp generator/*.html src/app/$APP_NAME
-        cp generator/*.css src/app/$APP_NAME
+        cp generator/temp/*.ts src/app/$APP_NAME
+        cp generator/temp/*.html src/app/$APP_NAME
+        cp generator/temp/*.css src/app/$APP_NAME
 
     - name: Commit and Push
       run: |
@@ -69,3 +63,8 @@ jobs:
         git commit -m "generated component"
         git push
 
+    - name: Publish Summary to Issue
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: gh issue comment "${{ github.event.issue.number }}" --body-file generator/temp/summary.md
