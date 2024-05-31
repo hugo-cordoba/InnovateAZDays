@@ -14,7 +14,7 @@ def call_openai(messages):
         model=deployment,
         messages = messages,
         temperature=0.1,
-        max_tokens=800
+        max_tokens=5000
     )
     print(response.choices[0].message.content)
     return response.choices[0].message
@@ -36,11 +36,11 @@ url = get_url('temp/body.txt')
 print(url)
 
 messages=[
-        { "role": "system", "content": "You are an assistant for web developers. You provide working source code based in image sketches. All your answers must be limited to output the generated file content. Don't add any explanation, instruction, or any markdown to the answer. Don't wrap the answer in markdown. Just output the generated file content." },
+        { "role": "system", "content": "You are an assistant for web developers. You provide working source code based in image sketches." },
         { "role": "user", "content": [  
             { 
                 "type": "text", 
-                "text": "I am creating an Angular project. I have already run the 'ng new' command and now I need the 'index.html', 'styles.css' and 'main.ts' files to create a web page based in this image. Please, first generate only the 'index.html' file." 
+                "text": "Based in this image, generate a markdown with the files that would be generated for a new standalone angular component for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this app." 
             },
             { 
                 "type": "image_url",
@@ -51,27 +51,41 @@ messages=[
         ] } 
     ]
 
-css_message = { "role": "user", "content": "Now generate only the 'styles.css' file." }
-ts_message = { "role": "user", "content": "And finally generate only the 'main.ts' file." }
-summary_message = { "role": "user", "content": "Now generate a summary in markdown of what has been done so a developer can understand the files generated." }
+model_message = { "role": "user", "content": "Generate the component model implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
+service_message = { "role": "user", "content": "Generate the component service implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
+logic_message = { "role": "user", "content": "Generate the component logic implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
+html_message = { "role": "user", "content": "Generate the component html implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
+css_message = { "role": "user", "content": "Generate the component css implementation file. Reply with the source code only. Don't wrap the answer in markdown." }
 
 response = call_openai(messages)
-write_file('temp/index.html', response.content)
+write_file('temp/summary.md', response.content)
+
+messages.append(response)
+messages.append(model_message)
+
+response = call_openai(messages)
+write_file('temp/model.ts', response.content)
+
+messages.append(response)
+messages.append(service_message)
+
+response = call_openai(messages)
+write_file('temp/service.ts', response.content)
+
+messages.append(response)
+messages.append(logic_message)
+
+response = call_openai(messages)
+write_file('temp/logic.ts', response.content)
+
+messages.append(response)
+messages.append(html_message)
+
+response = call_openai(messages)
+write_file('temp/html.html', response.content)
 
 messages.append(response)
 messages.append(css_message)
 
 response = call_openai(messages)
-write_file('temp/styles.css', response.content)
-
-messages.append(response)
-messages.append(ts_message)
-
-response = call_openai(messages)
-write_file('temp/main.ts', response.content)
-
-messages.append(response)
-messages.append(summary_message)
-
-response = call_openai(messages)
-write_file('temp/summary.md', response.content)
+write_file('temp/css.css', response.content)

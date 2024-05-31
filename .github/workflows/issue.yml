@@ -45,9 +45,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 22
-        cache: 'npm'
 
     - name: DEBUG angular
       run: |
         npm install @angular/cli@18
+        ng version
 
