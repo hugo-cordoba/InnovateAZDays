@@ -33,7 +33,7 @@ def get_url(file):
             return None
 
 url = get_url('temp/body.txt')
-print(f'URL: {url}
+print(url)
 
 messages=[
         { "role": "system", "content": "You are an assistant for web developers. You provide working source code based in image sketches. All your answers must be limited to output the generated file content. Don't add any explanation, instruction, or any markdown to the answer. Don't wrap the answer in markdown. Just output the genreated file content." },
