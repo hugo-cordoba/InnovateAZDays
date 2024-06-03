@@ -49,6 +49,8 @@ jobs:
         cp generator/temp/*.ts src/app/$APP_NAME
         cp generator/temp/*.html src/app/$APP_NAME
         cp generator/temp/*.css src/app/$APP_NAME
+        mkdir -p openapi
+        cp generator/temp/$APP_NAME.yml openapi/$APP_NAME.yml
 
     - name: Commit and push generated component
       run: |
