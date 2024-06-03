@@ -16,6 +16,8 @@ def call_openai_and_write_file(messages, file_name=""):
         max_tokens = 4000
     )
 
+    print(response.choices[0].message.content)
+
     file_json = json.loads(response.choices[0].message.content, strict=False)
     print(file_json['filecontent'])
 
