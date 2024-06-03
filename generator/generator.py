@@ -69,7 +69,7 @@ response = call_openai_and_write_file(messages, 'temp/summary.md')
 
 print("🚀🚀🚀 GENERATING API SPEC 🚀🚀🚀")
 
-messages.append(response, f'temp/{appname}.yml')
+messages.append(response, f"temp/{appname}.yml")
 messages.append({ "role": "user", "content": "Show me the same OpenAPI specification in YAML again. Don't wrap this json in markdown." })
 response = call_openai_and_write_file(messages)
 
