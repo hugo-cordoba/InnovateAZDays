@@ -16,15 +16,18 @@ def call_openai_and_write_file(messages, file_name=""):
         max_tokens = 4000
     )
 
-    print(response.choices[0].message.content)
-
-    file_json = json.loads(response.choices[0].message.content, strict=False)
-    print(file_json['filecontent'])
+    file_content = ""
 
     if not file_name:
+        file_json = json.loads(response.choices[0].message.content, strict=False)
+        file_content = file_json['filecontent']
+        print(file_content)
         file_name = "temp/" + file_json['filename']
+    else:
+        file_content = response.choices[0].message.content
+
     with open(file_name, 'w') as f:
-        f.write(file_json['filecontent'])
+        f.write(file_content)
 
     return response.choices[0].message
 
@@ -52,7 +55,7 @@ messages=[
     { "role": "user", "content": [  
         { 
             "type": "text", 
-            "text": f"Based on this image, generate a markdown file describing the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service to call the backend REST API, component logic, html and css. Do not include source code, just a summary of the component and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this component. Reply with the markdown file contents formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." 
+            "text": f"Based on this image, generate a markdown file describing the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service to call the backend REST API, component logic, html and css. Do not include source code, just a summary of the component and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this component. Don't wrap this json in markdown." 
         },
         { 
             "type": "image_url",
