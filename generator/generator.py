@@ -12,7 +12,7 @@ def call_openai_and_write_file(messages, file_name=""):
     response = client.chat.completions.create(
         model = os.getenv("CHAT_COMPLETIONS_DEPLOYMENT_NAME"),
         messages = messages,
-        temperature = 0.1,
+        temperature = 0.0001,
         max_tokens = 4000
     )
 
@@ -42,12 +42,15 @@ def get_appname(file):
 appname = get_appname('temp/title.txt')
 url = get_url('temp/body.txt')
 
+
+print("🚀🚀🚀 GENERATING SUMMARY 🚀🚀🚀")
+
 messages=[
     { "role": "system", "content": "You are an assistant for web developers. You provide working source code based on image sketches." },
     { "role": "user", "content": [  
         { 
             "type": "text", 
-            "text": f"Based on this image, generate a markdown file describing the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service, component logic, html and css. Do not include source code, just a summary of the component and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this component. Reply with the markdown file contents formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." 
+            "text": f"Based on this image, generate a markdown file describing the files that would be generated for a new standalone angular component named '{appname}' for this app. These include: model, service to call the backend REST API, component logic, html and css. Do not include source code, just a summary of the component and the files. Include in the summary an OpenAPI specification in YAML that describes the necessary API for this component. Reply with the markdown file contents formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." 
         },
         { 
             "type": "image_url",
@@ -55,35 +58,31 @@ messages=[
         }
     ] }
 ]
-print("🚀🚀🚀 GENERATING SUMMARY 🚀🚀🚀")
+
 response = call_openai_and_write_file(messages, 'temp/summary.md')
+
+print("🚀🚀🚀 GENERATING MODEL 🚀🚀🚀")
 
 messages.append(response)
 messages.append({ "role": "user", "content": "Generate the component model implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
-
-print("🚀🚀🚀 GENERATING MODEL 🚀🚀🚀")
 response = call_openai_and_write_file(messages)
-
-messages.append(response)
-messages.append({ "role": "user", "content": "Generate the component service implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 
 print("🚀🚀🚀 GENERATING SERVICE 🚀🚀🚀")
-response = call_openai_and_write_file(messages)
-
 messages.append(response)
-messages.append({ "role": "user", "content": "Generate the component logic implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
-
-print("🚀🚀🚀 GENERATING LOGIC 🚀🚀🚀")
+messages.append({ "role": "user", "content": "Generate the component service implementation file to call the backend REST API. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 response = call_openai_and_write_file(messages)
-
-messages.append(response)
-messages.append({ "role": "user", "content": "Generate the component html implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 
 print("🚀🚀🚀 GENERATING HTML 🚀🚀🚀")
+messages.append(response)
+messages.append({ "role": "user", "content": "Generate the component html implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 response = call_openai_and_write_file(messages)
 
+print("🚀🚀🚀 GENERATING CSS 🚀🚀🚀")
 messages.append(response)
 messages.append({ "role": "user", "content": "Generate the component css implementation file. Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
+response = call_openai_and_write_file(messages)
 
-print("🚀🚀🚀 GENERATING CSS 🚀🚀🚀")
+print("🚀🚀🚀 GENERATING COMPONENT 🚀🚀🚀")
+messages.append(response)
+messages.append({ "role": "user", "content": "Generate the standalone angular component logic implementation file (standalone: true). Reply with the source code formatted inside a json with two keys: 'filename' and 'filecontent'. Don't wrap this json in markdown." })
 response = call_openai_and_write_file(messages)
