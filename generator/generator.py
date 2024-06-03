@@ -21,10 +21,11 @@ def call_openai_and_write_file(messages, file_name=""):
     if not file_name:
         file_json = json.loads(response.choices[0].message.content, strict=False)
         file_content = file_json['filecontent']
-        print(file_content)
         file_name = "temp/" + file_json['filename']
     else:
         file_content = response.choices[0].message.content
+
+    print(file_content)
 
     with open(file_name, 'w') as f:
         f.write(file_content)
