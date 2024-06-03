@@ -42,7 +42,7 @@ jobs:
         npm install -g @angular/cli
         ng version
 
-    - name: Generate Angular component
+    - name: Build Angular component
       run: |
         APP_NAME=$(cat generator/temp/appname.txt)
         ng generate component $APP_NAME
@@ -60,6 +60,6 @@ jobs:
 
     - name: Publish summary to issue
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.DRHELIUS_TOKEN }}
         GH_REPO: ${{ github.repository }}
       run: gh issue comment "${{ github.event.issue.number }}" --body-file generator/temp/summary.md
