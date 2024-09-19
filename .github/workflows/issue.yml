@@ -62,6 +62,6 @@ jobs:
 
     - name: Publish summary to issue
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.REPO_TOKEN }}
         GH_REPO: ${{ github.repository }}
       run: gh issue comment "${{ github.event.issue.number }}" --body-file generator/temp/summary.md
